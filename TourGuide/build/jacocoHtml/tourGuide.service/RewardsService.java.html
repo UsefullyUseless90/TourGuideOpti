@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RewardsService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TourGuide</a> &gt; <a href="index.source.html" class="el_package">tourGuide.service</a> &gt; <span class="el_source">RewardsService.java</span></div><h1>RewardsService.java</h1><pre class="source lang-java linenums">package tourGuide.service;
+
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import tourGuide.controller.TourGuideController;
+import tourGuide.model.Attraction;
+import tourGuide.model.Location;
+import tourGuide.model.VisitedLocation;
+import tourGuide.proxies.GpsProxy;
+import tourGuide.proxies.RewardProxy;
+import tourGuide.model.user.User;
+import tourGuide.model.user.UserReward;
+
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
+@Service
+public class RewardsService {
+
+	private static final double STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
+
+<span class="fc" id="L25">    private int defaultProximityBuffer = 10;</span>
+<span class="fc" id="L26">	private int proximityBuffer = defaultProximityBuffer;</span>
+<span class="fc" id="L27">	private int attractionProximityRange = 200;</span>
+
+	private final RewardProxy rewardProxy;
+	private final GpsProxy gpsProxy;
+
+<span class="fc" id="L32">	private final Logger logger = LogManager.getLogger(TourGuideController.class);</span>
+
+	/**
+	 * Initialize Reward Service with new params
+	 * @param gpsProxy
+	 * @param rewardProxy
+	 */
+<span class="fc" id="L39">	public RewardsService(GpsProxy gpsProxy, RewardProxy rewardProxy) {</span>
+<span class="fc" id="L40">		this.gpsProxy = gpsProxy;</span>
+<span class="fc" id="L41">		this.rewardProxy = rewardProxy;</span>
+<span class="fc" id="L42">	}</span>
+
+	/**
+	 *
+	 * @param proximityBuffer
+	 */
+	public void setProximityBuffer(int proximityBuffer) {
+<span class="nc" id="L49">		this.proximityBuffer = proximityBuffer;</span>
+<span class="nc" id="L50">	}</span>
+
+	/**
+	 *
+	 */
+	public void setDefaultProximityBuffer() {
+<span class="nc" id="L56">		proximityBuffer = defaultProximityBuffer;</span>
+<span class="nc" id="L57">	}</span>
+
+	/**
+	 * Method that calculate rewards for a user
+	 * @param user
+	 * @return user
+	 */
+	public CompletableFuture&lt;User&gt; calculateRewards(User user) {
+<span class="fc" id="L65">		logger.info(&quot;Creating a list of all visited location by :&quot; + user);</span>
+<span class="fc" id="L66">		List&lt;VisitedLocation&gt; userLocations = user.getVisitedLocations();</span>
+<span class="fc" id="L67">		logger.info(&quot;Creating a list of all attractions...&quot;);</span>
+<span class="fc" id="L68">		List&lt;Attraction&gt; attractions = gpsProxy.getAttractions();</span>
+<span class="fc" id="L69">		logger.info(&quot;Seeking visited location by user...&quot;);</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">		for(VisitedLocation visitedLocation : userLocations) {</span>
+<span class="fc" id="L71">			logger.info(&quot;Seeking attractions done by user...&quot;);</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">			for(Attraction attraction : attractions) {</span>
+<span class="fc" id="L73">				logger.info(&quot;Sorting rewards for attraction done by user...&quot;);</span>
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">				if(user.getUserRewards().stream().filter(r -&gt; r.attraction.attractionName.equals(attraction.attractionName)).count() == 0) {</span>
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">					if(nearAttraction(visitedLocation, attraction)) {</span>
+<span class="nc" id="L76">						logger.info(&quot;Adding rewards for new visited attractions user...&quot;);</span>
+<span class="nc" id="L77">						user.addUserReward(new UserReward(visitedLocation, attraction));</span>
+					}
+				}
+<span class="fc" id="L80">			}</span>
+<span class="fc" id="L81">		}</span>
+<span class="fc" id="L82">		logger.info(&quot;Rewards are up to date for: &quot; + user);</span>
+<span class="fc" id="L83">		return CompletableFuture.completedFuture(user) ;</span>
+	}
+
+	/**
+	 * Method used to know if an attraction is in proximity or not
+	 * @param attraction
+	 * @param location
+	 * @return boolean
+	 */
+	public boolean isWithinAttractionProximity(Attraction attraction, Location location) {
+<span class="nc bnc" id="L93" title="All 2 branches missed.">		return getDistance(attraction, location) &gt; attractionProximityRange ? false : true;</span>
+	}
+
+	/**
+	 * Method to get attraction near last location
+	 * @param visitedLocation
+	 * @param attraction
+	 * @return distance between attraction and last location
+	 */
+	private boolean nearAttraction(VisitedLocation visitedLocation, Attraction attraction) {
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">		return getDistance(attraction, visitedLocation.location) &gt; proximityBuffer ? false : true;</span>
+	}
+	/*
+	private CompletableFuture&lt;Integer&gt; getRewardPoints(Attraction attraction, User user) {
+		return rewardProxy.getAttractionRewardPoints(attraction.attractionId, user.getUserId());
+	}
+
+	 */
+
+	/**
+	 * Method used for distance in miles
+	 * @param loc1
+	 * @param loc2
+	 * @return
+	 */
+	public double getDistance(Location loc1, Location loc2) {
+<span class="fc" id="L119">        double lat1 = Math.toRadians(loc1.latitude);</span>
+<span class="fc" id="L120">        double lon1 = Math.toRadians(loc1.longitude);</span>
+<span class="fc" id="L121">        double lat2 = Math.toRadians(loc2.latitude);</span>
+<span class="fc" id="L122">        double lon2 = Math.toRadians(loc2.longitude);</span>
+
+<span class="fc" id="L124">        double angle = Math.acos(Math.sin(lat1) * Math.sin(lat2)</span>
+<span class="fc" id="L125">                               + Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon1 - lon2));</span>
+
+<span class="fc" id="L127">        double nauticalMiles = 60 * Math.toDegrees(angle);</span>
+<span class="fc" id="L128">        double statuteMiles = STATUTE_MILES_PER_NAUTICAL_MILE * nauticalMiles;</span>
+<span class="fc" id="L129">        return statuteMiles;</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

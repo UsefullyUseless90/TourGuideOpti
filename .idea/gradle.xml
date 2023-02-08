@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/GPS" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../gradle/gradle-7.6" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/GPS" />
+            <option value="$PROJECT_DIR$/GPS/GpsApp" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/Reward" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../gradle/gradle-7.6" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/Reward" />
+            <option value="$PROJECT_DIR$/Reward/RewardApp" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/TourGuide" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../gradle/gradle-7.6" />
+        <option name="gradleJvm" value="adopt-openjdk-1.8" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/TourGuide" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/TripPricer" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../gradle/gradle-7.6" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/TripPricer" />
+            <option value="$PROJECT_DIR$/TripPricer/app" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>
