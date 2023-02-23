@@ -1,0 +1,51 @@
+
+version: "0.0.1"
+services:
+  main:
+    image: tourguide
+    container_name: tourGuide
+    build:
+      context: TourGuide
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - web-server
+    restart: always
+  gps:
+    image: gps
+    container_name: Gps
+    build:
+      context: GPS
+      dockerfile: Dockerfile
+    ports:
+      - "8090:8090"
+    networks:
+      - web-server
+    restart: always
+  trippricer:
+    image: trippricer
+    container_name: TripPricer
+    build:
+      context: TripPricer
+      dockerfile: Dockerfile
+    ports:
+      - "8092:8092"
+    networks:
+      - web-server
+    restart: always
+  reward:
+    image: reward
+    container_name: reward
+    build:
+      context: Reward
+      dockerfile: Dockerfile
+    ports:
+      - "8088:8088"
+    networks:
+      - web-server
+    restart: always
+
+networks:
+  web-server:
+    driver: bridge

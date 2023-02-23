@@ -5,6 +5,9 @@
  * For more details take a look at the 'Building Java & JVM projects' chapter in the Gradle
  * User Manual available at https://docs.gradle.org/7.6/userguide/building_java_projects.html
  */
+ 
+group = "TourGuide"
+version = "0.0.1-SNAPSHOT"
 
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.

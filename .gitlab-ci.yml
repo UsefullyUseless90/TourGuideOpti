@@ -1,0 +1,70 @@
+stages: 
+  - build
+  - test 
+
+image: gradle:alpine
+
+variables:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
+tourguide-build:
+  stage: build
+  script: 
+    - cd TourGuide
+    - gradle --build-cache assemble
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: push
+    paths:
+      - build
+      - .gradle
+
+gps-build:
+  stage: build
+  script: 
+    - cd GPS
+    - gradle --build-cache assemble
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: push
+    paths:
+      - build
+      - .gradle
+
+trip-pricer-build:
+  stage: build
+  script: 
+    - cd TripPricer
+    - gradle --build-cache assemble
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: push
+    paths:
+      - build
+      - .gradle
+
+reward-build:
+  stage: build
+  script: 
+    - cd Reward
+    - gradle --build-cache assemble
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: push
+    paths:
+      - build
+      - .gradle
+
+# This job runs in the test stage.
+unit-test-app:   
+  stage: test    # It only starts when the job in the build stage completes successfully.
+  image:  gradle:7.1.0-jdk11
+  script:
+    - cd TourGuide 
+    - chmod +x gradlew && ./gradlew test
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: push
+    paths:
+      - build
+      - .gradle
