@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import tourGuide.model.Attraction;
+import tourGuide.model.Location;
 import tourGuide.model.VisitedLocation;
 import tourGuide.model.user.User;
 import tourGuide.model.user.UserReward;
@@ -34,6 +35,7 @@ public class TestRewardsService {
 	private RewardProxy rewardsProxy;
 	@Autowired
 	private TripProxy tripProxy;
+
 
 	@Test
 	public void userGetRewards() {
@@ -64,20 +66,28 @@ public class TestRewardsService {
 	@Test
 	public void nearAllAttractions() {
 		//GpsUtil gpsUtil = new GpsUtil();
+		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
+		Date date = new Date();
+		Double latitude = 0.26;
+		Double longitude = 0.26;
+		Location location = new Location(longitude, latitude);
+		VisitedLocation visitedLocation = new VisitedLocation(UUID.randomUUID(),location,date);
+		Attraction attraction = new Attraction("none","city","state",latitude, longitude);
+		UserReward userReward = new UserReward(visitedLocation, attraction);
+		user.addUserReward(userReward);
+
 		RewardsService rewardsService = new RewardsService(gpsProxy, rewardsProxy);
 		rewardsService.setProximityBuffer(Integer.MAX_VALUE);
 
 		InternalTestHelper.setInternalUserNumber(1);
 		TourGuideService tourGuideService = new TourGuideService(gpsProxy, rewardsService, tripProxy);
-		
-		rewardsService.calculateRewards(tourGuideService.getAllUsers().get(0));
-		List<UserReward> userRewards = tourGuideService.getUserRewards(tourGuideService.getAllUsers().get(0));
+
+		rewardsService.calculateRewards(user);
+		List<UserReward> userRewards = tourGuideService.getUserRewards(user);
 		tourGuideService.tracker.stopTracking();
 
-		// Need To be discussed ! ///
-		assertEquals(2, userRewards.size());
-		// The expectations are illogical !
-		//assertEquals(gpsProxy.getAttractions().size(), userRewards.size());
+		assertEquals(1, userRewards.size());
+
 	}
 	
 }

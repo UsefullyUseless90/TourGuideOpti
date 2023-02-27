@@ -4,11 +4,10 @@ import com.jsoniter.output.JsonStream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import tourGuide.model.Location;
 import tourGuide.model.VisitedLocation;
+import tourGuide.model.user.UserPreferences;
 import tourGuide.service.TourGuideService;
 import tourGuide.model.user.User;
 import tripPricer.Provider;
@@ -104,6 +103,9 @@ public class TourGuideController {
         logger.info("User found: " + tourGuideService.getUser(userName));
     	return tourGuideService.getUser(userName);
     }
-   
+    @PutMapping("/setUserPreferences")
+    public String setUserPreferences(@RequestParam String username, @RequestBody UserPreferences userPreferences) {
+        return JsonStream.serialize(tourGuideService.setUserPreferences(username, userPreferences));
+    }
 
 }

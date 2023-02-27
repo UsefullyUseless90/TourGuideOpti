@@ -1,11 +1,15 @@
 package tourGuide.service;
 
+import com.jsoniter.output.JsonStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import tourGuide.model.Attraction;
 import tourGuide.model.Location;
 import tourGuide.model.VisitedLocation;
+import tourGuide.model.user.UserPreferences;
 import tourGuide.proxies.GpsProxy;
 import tourGuide.proxies.RewardProxy;
 import tourGuide.proxies.TripProxy;
@@ -103,6 +107,24 @@ public class TourGuideService {
 		logger.info(userName + "'s infos: " + internalUserMap.get(userName));
 		return internalUserMap.get(userName);
 	}
+	public UserPreferences setUserPreferences(@RequestParam String username, @RequestBody UserPreferences userPreferences) {
+		if(internalUserMap.containsKey(username)){
+			User user = getUser(username);
+			UserPreferences u2 = new UserPreferences();
+			u2.setAttractionProximity(userPreferences.getAttractionProximity());
+			u2.setLowerPricePoint(userPreferences.getLowerPricePoint());
+			u2.setHighPricePoint(userPreferences.getHighPricePoint());
+			u2.setTripDuration(userPreferences.getTripDuration());
+			u2.setTicketQuantity(userPreferences.getTicketQuantity());
+			u2.setNumberOfAdults(userPreferences.getNumberOfAdults());
+			u2.setNumberOfChildren(userPreferences.getNumberOfChildren());
+			user.setUserPreferences(u2);
+		}else{
+			logger.info("No user found!");
+		}
+		return userPreferences;
+	}
+
 
 	/**
 	 * Method to get all users of the system
@@ -131,7 +153,8 @@ public class TourGuideService {
 	 */
 	public List<Provider> getTripDeals(User user) {
 		int cumulatativeRewardPoints = user.getUserRewards().stream().mapToInt(i -> i.getRewardPoints()).sum();
-		List<Provider> providers = tripPricer.getPrice(tripPricerApiKey, user.getUserId(), user.getUserPreferences().getNumberOfAdults(), user.getUserPreferences().getNumberOfChildren(), user.getUserPreferences().getTripDuration(), cumulatativeRewardPoints);
+		List<Provider> providers = tripPricer.getPrice(tripPricerApiKey, user.getUserId(), user.getUserPreferences().getNumberOfAdults(),
+				user.getUserPreferences().getNumberOfChildren(), user.getUserPreferences().getTripDuration(), cumulatativeRewardPoints);
 		logger.info("Creating a list of trip deals...");
 		user.setTripDeals(providers);
 		logger.info("Trip deals available for: " + user);

@@ -86,8 +86,9 @@ public class User {
 		return userPreferences;
 	}
 	
-	public void setUserPreferences(UserPreferences userPreferences) {
+	public UserPreferences setUserPreferences(UserPreferences userPreferences) {
 		this.userPreferences = userPreferences;
+		return this.userPreferences;
 	}
 
 	public VisitedLocation getLastVisitedLocation() {
