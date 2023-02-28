@@ -163,6 +163,16 @@ public class TourGuideService {
 	}
 
 	/**
+	 * Method parametrized for Tripdeals according to user preferences
+	 * @param username
+	 * @return
+	 */
+	public List<Provider> getTripDealsAccordingToUserPreferences (String username){
+		User user = getUser(username);
+		return getTripDeals(user);
+	}
+
+	/**
 	 * Method to get user's id, location and date that the location was visited
 	 * @param user
 	 * @return Visited Location object
